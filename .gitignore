@@ -3,4 +3,5 @@ build
 .idea
 *.iml
 ci/variables.yml
-flyway.conf
+flyway.review.conf
+flyway.production.conf
