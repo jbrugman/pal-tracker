@@ -1,6 +1,9 @@
+import org.flywaydb.gradle.task.FlywayMigrateTask
+
 plugins {
     id "java"
     id "org.springframework.boot" version "1.5.4.RELEASE"
+    id "org.flywaydb.flyway" version "4.2.0"
 }
 
 repositories {
@@ -9,13 +12,30 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-jdbc")
+    compile("org.mariadb.jdbc:mariadb-java-client:2.0.2")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
+def developmentDbUrl = "jdbc:mariadb://localhost:3306/tracker_dev?user=tracker"
 bootRun.environment([
+        "SPRING_DATASOURCE_URL": developmentDbUrl,
         "WELCOME_MESSAGE": "hello",
 ])
 
+def testDbUrl = "jdbc:mariadb://localhost:3306/tracker_test?user=tracker"
 test.environment([
+        "SPRING_DATASOURCE_URL": testDbUrl,
         "WELCOME_MESSAGE": "Hello from test",
 ])
+
+flyway {
+    url = developmentDbUrl
+    user = "tracker"
+    password = ""
+    locations = ["filesystem:databases/tracker/migrations"]
+}
+
+task testMigrate(type: FlywayMigrateTask) {
+    url = testDbUrl
+}
